@@ -2,25 +2,11 @@
   <!-- Rounded teal background -->
   <rect width="512" height="512" rx="160" fill="#006666"/>
   
-  <!-- Subtle outer circular frame (Stay static) -->
-  <circle cx="256" cy="256" r="180" fill="none" stroke="#FDFCF0" stroke-width="4" opacity="0.3"/>
-  
-  <!-- Rotated Compass Elements -->
-  <g transform="rotate(22 256 256)">
-    <!-- Cardinal points (Dots) -->
-    <circle cx="256" cy="76" r="6" fill="#FDFCF0" opacity="0.8"/> <!-- North -->
-    <circle cx="256" cy="436" r="4" fill="#FDFCF0" opacity="0.4"/> <!-- South -->
-    <circle cx="436" cy="256" r="4" fill="#FDFCF0" opacity="0.4"/> <!-- East -->
-    <circle cx="76" cy="256" r="4" fill="#FDFCF0" opacity="0.4"/> <!-- West -->
-
-    <!-- The "Folded V" Needle -->
-    <!-- Left wing shadow -->
-    <path d="M160 160 L256 400 L256 300 Z" fill="#FDFCF0" opacity="0.7"/>
-    <!-- Right wing light -->
-    <path d="M352 160 L256 400 L256 300 Z" fill="#FDFCF0"/>
-    
-    <!-- Center pivot "Lens" point -->
-    <circle cx="256" cy="280" r="28" fill="#006666" stroke="#FDFCF0" stroke-width="8"/>
-    <circle cx="256" cy="280" r="8" fill="#FDFCF0"/>
+  <!-- Rotated Clean "Folded V" -->
+  <g transform="rotate(15 256 256)">
+    <!-- Left fold (slightly darker) -->
+    <path d="M160 160 L256 420 L256 310 Z" fill="#FDFCF0" opacity="0.8"/>
+    <!-- Right fold (clean cream) -->
+    <path d="M352 160 L256 420 L256 310 Z" fill="#FDFCF0"/>
   </g>
 </svg>
