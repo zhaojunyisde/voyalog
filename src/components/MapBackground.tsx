@@ -79,8 +79,8 @@ const PhotoMarkers = () => {
                     >
                         <Popup
                             className={`voyalog-photo-popup ${lat > 20 ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
-                            minWidth={isMobile ? 280 : 620}
-                            maxWidth={isMobile ? 320 : 700}
+                            minWidth={isMobile ? undefined : 620}
+                            maxWidth={isMobile ? undefined : 700}
                             offset={lat > 20 ? [0, 20] : [0, -20]}
                             autoPan={false}
                         >
@@ -88,19 +88,26 @@ const PhotoMarkers = () => {
                                 display: 'flex',
                                 flexDirection: isMobile ? 'column' : 'row',
                                 margin: '0',
-                                minWidth: isMobile ? 'auto' : '620px'
+                                minWidth: isMobile ? 'auto' : '620px',
+                                width: isMobile ? '80vw' : 'auto',
+                                maxWidth: isMobile ? '80vw' : 'none'
                             }}>
                                 {/* Left: Image */}
                                 <div style={{
                                     position: 'relative',
                                     flex: isMobile ? 'none' : '1 1 60%',
-                                    height: isMobile ? '200px' : 'auto',
                                     minWidth: 0
                                 }}>
                                     <img
                                         src={photo.fullImageUrl}
                                         alt={photo.locationName}
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                        style={{
+                                            width: '100%',
+                                            height: isMobile ? 'auto' : '100%',
+                                            maxHeight: isMobile ? '60vh' : 'none',
+                                            objectFit: isMobile ? 'contain' : 'cover',
+                                            display: 'block'
+                                        }}
                                     />
                                     <a
                                         href={photo.fullImageUrl}
@@ -108,16 +115,18 @@ const PhotoMarkers = () => {
                                         rel="noopener noreferrer"
                                         style={{
                                             position: 'absolute',
-                                            bottom: '12px', right: '12px',
+                                            bottom: isMobile ? '8px' : '12px',
+                                            right: isMobile ? '8px' : '12px',
                                             background: 'rgba(0,0,0,0.5)',
                                             backdropFilter: 'blur(4px)',
                                             color: 'white',
-                                            padding: '6px 12px',
+                                            padding: isMobile ? '8px' : '6px 12px',
                                             borderRadius: '20px',
                                             textDecoration: 'none',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '6px',
+                                            justifyContent: 'center',
+                                            gap: isMobile ? '0' : '6px',
                                             fontSize: '0.75rem',
                                             fontWeight: '600',
                                             border: '1px solid rgba(255,255,255,0.2)',
@@ -132,24 +141,24 @@ const PhotoMarkers = () => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
-                                        <ExternalLink size={14} /> Full Res
+                                        <ExternalLink size={isMobile ? 16 : 14} />{!isMobile && ' Full Res'}
                                     </a>
                                 </div>
                                 {/* Right: Metadata Panel */}
                                 <div style={{
                                     flex: isMobile ? 'none' : '0 0 220px',
-                                    padding: isMobile ? '1.5rem' : '28px 24px',
+                                    padding: isMobile ? '0.75rem 1rem' : '28px 24px',
                                     background: 'var(--bg-primary)',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'center',
-                                    gap: '0.5rem',
+                                    gap: isMobile ? '0.25rem' : '0.5rem',
                                     borderLeft: isMobile ? 'none' : '1px solid var(--border-color)',
                                     borderTop: isMobile ? '1px solid var(--border-color)' : 'none'
                                 }}>
                                     <div style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                        color: 'var(--accent)', fontSize: '0.7rem',
+                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                        color: 'var(--accent)', fontSize: isMobile ? '0.6rem' : '0.7rem',
                                         fontWeight: '700', letterSpacing: '0.1em',
                                         textTransform: 'uppercase'
                                     }}>
@@ -158,13 +167,13 @@ const PhotoMarkers = () => {
                                     </div>
                                     <h4 style={{
                                         margin: '0', fontWeight: '800',
-                                        color: 'var(--text-primary)', fontSize: isMobile ? '1.1rem' : '1.3rem',
+                                        color: 'var(--text-primary)', fontSize: isMobile ? '0.9rem' : '1.3rem',
                                         fontFamily: 'var(--font-main)', lineHeight: '1.3'
                                     }}>{photo.locationName}</h4>
                                     {photo.description && (
                                         <p style={{
-                                            fontSize: '0.8rem', color: 'var(--text-secondary)',
-                                            fontStyle: 'italic', lineHeight: '1.5', margin: '0'
+                                            fontSize: isMobile ? '0.7rem' : '0.8rem', color: 'var(--text-secondary)',
+                                            fontStyle: 'italic', lineHeight: isMobile ? '1.3' : '1.5', margin: '0'
                                         }}>"{photo.description}"</p>
                                     )}
                                 </div>
