@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Compass } from 'lucide-react';
 
 export const Navbar: React.FC = () => (
     <nav className="glass" style={{
@@ -15,12 +14,13 @@ export const Navbar: React.FC = () => (
     }}>
         <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.5rem', fontFamily: 'var(--font-main)' }}>
             <div style={{
-                background: 'var(--accent)',
-                padding: '0.4rem',
+                width: '36px',
+                height: '36px',
                 borderRadius: '0.5rem',
+                overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
-                <Compass size={24} color="var(--bg-primary)" />
+                <img src="/logo.svg" alt="Voyalog Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span>VOYALOG</span>
         </div>
