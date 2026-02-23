@@ -4,15 +4,18 @@ import L from 'leaflet';
 import { SAMPLE_PHOTOS } from '../data/photographyData';
 import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useIsMobile } from '../hooks/useMobile';
 
 // Custom Marker Icon generated per photo
-const createPhotoIcon = (url: string) => L.divIcon({
-    className: 'custom-photo-marker',
-    html: `<div style="
-        width: 45px; 
-        height: 45px; 
+const createPhotoIcon = (url: string, isMobile: boolean) => {
+    const size = isMobile ? 36 : 45;
+    return L.divIcon({
+        className: 'custom-photo-marker',
+        html: `<div style="
+        width: ${size}px; 
+        height: ${size}px; 
         border-radius: 50%; 
-        border: 3px solid white; 
+        border: ${isMobile ? '2px' : '3px'} solid white; 
         box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         background-image: url(${url});
         background-size: cover;
@@ -21,12 +24,14 @@ const createPhotoIcon = (url: string) => L.divIcon({
         cursor: pointer;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     " onmouseover="this.style.transform='scale(1.2) translateY(-5px)'; this.style.opacity='1'; window.dispatchEvent(new Event('map-hover-start'))" onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.opacity='0.8'; window.dispatchEvent(new Event('map-hover-end'))"></div>`,
-    iconSize: [45, 45],
-    iconAnchor: [22, 22]
-});
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2]
+    });
+};
 
 const PhotoMarkers = () => {
     const map = useMap();
+    const isMobile = useIsMobile();
     const [offsets, setOffsets] = useState([-360, 0, 360]);
 
     useEffect(() => {
@@ -65,7 +70,7 @@ const PhotoMarkers = () => {
                     <Marker
                         key={`${photo.id}-${offset}`}
                         position={[lat, lng + offset]}
-                        icon={createPhotoIcon(photo.thumbnailUrl)}
+                        icon={createPhotoIcon(photo.thumbnailUrl, isMobile)}
                         eventHandlers={{
                             click: () => {
                                 map.panTo([map.getCenter().lat, lng + offset], { animate: true });
@@ -73,14 +78,25 @@ const PhotoMarkers = () => {
                         }}
                     >
                         <Popup
-                            className={`voyalog-photo-popup ${lat > 20 ? 'popup-down' : ''}`}
-                            minWidth={620}
+                            className={`voyalog-photo-popup ${lat > 20 ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
+                            minWidth={isMobile ? 280 : 620}
+                            maxWidth={isMobile ? 320 : 700}
                             offset={lat > 20 ? [0, 20] : [0, -20]}
                             autoPan={false}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'row', margin: '0', minWidth: '620px' }}>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: isMobile ? 'column' : 'row',
+                                margin: '0',
+                                minWidth: isMobile ? 'auto' : '620px'
+                            }}>
                                 {/* Left: Image */}
-                                <div style={{ position: 'relative', flex: '1 1 60%', minWidth: 0 }}>
+                                <div style={{
+                                    position: 'relative',
+                                    flex: isMobile ? 'none' : '1 1 60%',
+                                    height: isMobile ? '200px' : 'auto',
+                                    minWidth: 0
+                                }}>
                                     <img
                                         src={photo.fullImageUrl}
                                         alt={photo.locationName}
@@ -102,7 +118,7 @@ const PhotoMarkers = () => {
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '6px',
-                                            fontSize: '0.8rem',
+                                            fontSize: '0.75rem',
                                             fontWeight: '600',
                                             border: '1px solid rgba(255,255,255,0.2)',
                                             transition: 'all 0.2s ease'
@@ -121,33 +137,34 @@ const PhotoMarkers = () => {
                                 </div>
                                 {/* Right: Metadata Panel */}
                                 <div style={{
-                                    flex: '0 0 220px',
-                                    padding: '28px 24px',
+                                    flex: isMobile ? 'none' : '0 0 220px',
+                                    padding: isMobile ? '1.5rem' : '28px 24px',
                                     background: 'var(--bg-primary)',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'center',
-                                    gap: '0.75rem',
-                                    borderLeft: '1px solid var(--border-color)'
+                                    gap: '0.5rem',
+                                    borderLeft: isMobile ? 'none' : '1px solid var(--border-color)',
+                                    borderTop: isMobile ? '1px solid var(--border-color)' : 'none'
                                 }}>
                                     <div style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                        color: 'var(--accent)', fontSize: '0.75rem',
+                                        color: 'var(--accent)', fontSize: '0.7rem',
                                         fontWeight: '700', letterSpacing: '0.1em',
                                         textTransform: 'uppercase'
                                     }}>
-                                        <span style={{ width: '20px', height: '1px', background: 'var(--accent)', display: 'inline-block' }}></span>
+                                        <span style={{ width: '16px', height: '1px', background: 'var(--accent)', display: 'inline-block' }}></span>
                                         {photo.date}
                                     </div>
                                     <h4 style={{
                                         margin: '0', fontWeight: '800',
-                                        color: 'var(--text-primary)', fontSize: '1.3rem',
+                                        color: 'var(--text-primary)', fontSize: isMobile ? '1.1rem' : '1.3rem',
                                         fontFamily: 'var(--font-main)', lineHeight: '1.3'
                                     }}>{photo.locationName}</h4>
                                     {photo.description && (
                                         <p style={{
-                                            fontSize: '0.88rem', color: 'var(--text-secondary)',
-                                            fontStyle: 'italic', lineHeight: '1.6', margin: '0'
+                                            fontSize: '0.8rem', color: 'var(--text-secondary)',
+                                            fontStyle: 'italic', lineHeight: '1.5', margin: '0'
                                         }}>"{photo.description}"</p>
                                     )}
                                 </div>
@@ -234,19 +251,20 @@ const AutoPan = () => {
 };
 
 export default function MapBackground() {
+    const isMobile = useIsMobile();
     return (
         <div style={{
-            position: 'fixed',
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            height: '100%',
             zIndex: 0,
             pointerEvents: 'auto' // Make map interactable
         }}>
             <MapContainer
                 center={[20, 0]}
-                zoom={3.0}
+                zoom={isMobile ? 2.2 : 3.0}
                 zoomControl={false} // Hidden for cleaner map background
                 dragging={false} // User cannot move map
                 scrollWheelZoom={false} // Disabled so users don't zoom in while scrolling

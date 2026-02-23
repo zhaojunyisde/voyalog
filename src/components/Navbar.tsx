@@ -8,32 +8,33 @@ export const Navbar: React.FC = () => (
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1.2rem 4rem',
+        padding: 'var(--nav-pad)',
         zIndex: 100,
         pointerEvents: 'none'
     }}>
-        <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.5rem', fontFamily: 'var(--font-main)' }}>
+        <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.25rem', fontFamily: 'var(--font-main)' }}>
             <div style={{
-                width: '36px',
-                height: '36px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '0.5rem',
                 overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
                 <img src="/logo.svg" alt="Voyalog Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <span>VOYALOG</span>
+            <span style={{ letterSpacing: '-0.02em' }}>VOYALOG</span>
         </div>
-        <div style={{ pointerEvents: 'auto', display: 'flex', gap: '2rem', alignItems: 'center', fontWeight: '500', fontFamily: 'var(--font-main)' }}>
+        <div className="nav-links" style={{ pointerEvents: 'auto' }}>
             <Link to="/explore" className="nav-link">Explore</Link>
             <Link to="/about" className="nav-link">About</Link>
             <Link to="/login" style={{
-                padding: '0.6rem 1.4rem',
+                padding: '0.5rem 1.2rem',
                 borderRadius: '2rem',
                 backgroundColor: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 transition: 'all 0.3s ease',
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                fontSize: '0.9rem'
             }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--text-primary)';
@@ -45,12 +46,13 @@ export const Navbar: React.FC = () => (
                 }}
             >Sign In</Link>
             <Link to="/signup" style={{
-                padding: '0.6rem 1.4rem',
+                padding: '0.5rem 1.2rem',
                 borderRadius: '2rem',
                 background: 'var(--accent)',
                 color: 'var(--bg-primary)',
                 fontWeight: '600',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                fontSize: '0.9rem'
             }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.opacity = '0.9';
@@ -60,7 +62,7 @@ export const Navbar: React.FC = () => (
                     e.currentTarget.style.opacity = '1';
                     e.currentTarget.style.transform = 'translateY(0)';
                 }}
-            >Get Started</Link>
+            >Join</Link>
         </div>
     </nav>
 );
