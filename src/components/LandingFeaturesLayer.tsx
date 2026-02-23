@@ -36,7 +36,7 @@ const LandingFeaturesLayer: React.FC<Props> = ({ featuresOpacity, featuresY, car
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
                 style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-                <div className="feature-grid" style={{ pointerEvents: 'auto' }}>
+                <div className="feature-grid" style={{ pointerEvents: 'none' }}>
                     {[
                         {
                             icon: <Map size={28} color="var(--accent)" />,

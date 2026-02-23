@@ -64,7 +64,7 @@ export const LandingPage: React.FC = () => {
                 height: '100vh',
                 width: '100%',
                 overflow: 'hidden',
-                zIndex: 1
+                zIndex: 10
             }}>
                 {/* Layer 1 – Map background */}
                 <LandingMapLayer mapScale={mapScale} />
@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
                     padding: '1rem',
                     textAlign: 'center',
                     color: 'var(--text-secondary)',
-                    zIndex: 1,
+                    zIndex: 0,
                     fontSize: '0.85rem',
                     pointerEvents: 'none',
                 }}

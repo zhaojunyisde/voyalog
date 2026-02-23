@@ -6,10 +6,14 @@ import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMobile';
 
-// Custom Marker Icon generated per photo
-const createPhotoIcon = (url: string, isMobile: boolean) => {
+// Custom Marker Icon generated per photo - Memoized cache
+const iconCache: Record<string, L.DivIcon> = {};
+const getPhotoIcon = (url: string, isMobile: boolean) => {
+    const key = `${url}-${isMobile}`;
+    if (iconCache[key]) return iconCache[key];
+
     const size = isMobile ? 36 : 45;
-    return L.divIcon({
+    const icon = L.divIcon({
         className: 'custom-photo-marker',
         html: `<div style="
         width: ${size}px; 
@@ -27,6 +31,8 @@ const createPhotoIcon = (url: string, isMobile: boolean) => {
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2]
     });
+    iconCache[key] = icon;
+    return icon;
 };
 
 const PhotoMarkers = () => {
@@ -66,29 +72,43 @@ const PhotoMarkers = () => {
     const [popupMaxHeights, setPopupMaxHeights] = useState<Record<string, number>>({});
 
     useEffect(() => {
+        let throttleTimer: ReturnType<typeof setTimeout> | null = null;
         const updateDirections = () => {
-            const mapHeight = map.getSize().y;
-            const directions: Record<string, boolean> = {};
-            const maxHeights: Record<string, number> = {};
-            SAMPLE_PHOTOS.forEach(photo => {
-                const [lat, lng] = photo.coordinates;
-                offsets.forEach(offset => {
-                    const key = `${photo.id}-${offset}`;
-                    const point = map.latLngToContainerPoint([lat, lng + offset]);
-                    const isInTopHalf = point.y < mapHeight / 2;
-                    directions[key] = isInTopHalf;
-                    const availableH = isInTopHalf
-                        ? mapHeight - point.y - 60
-                        : point.y - 60;
-                    maxHeights[key] = Math.max(availableH, 150);
+            if (throttleTimer) return;
+            throttleTimer = setTimeout(() => {
+                throttleTimer = null;
+                const mapHeight = map.getSize().y;
+                const directions: Record<string, boolean> = {};
+                const maxHeights: Record<string, number> = {};
+                SAMPLE_PHOTOS.forEach(photo => {
+                    const [lat, lng] = photo.coordinates;
+                    offsets.forEach(offset => {
+                        const key = `${photo.id}-${offset}`;
+                        const point = map.latLngToContainerPoint([lat, lng + offset]);
+                        const isInTopHalf = point.y < mapHeight / 2;
+                        directions[key] = isInTopHalf;
+                        const availableH = isInTopHalf
+                            ? mapHeight - point.y - 60
+                            : point.y - 60;
+                        maxHeights[key] = Math.max(availableH, 150);
+                    });
                 });
-            });
-            setPopupDirections(directions);
-            setPopupMaxHeights(maxHeights);
+                setPopupDirections(prev => {
+                    const changed = Object.keys(directions).some(k => prev[k] !== directions[k]);
+                    return changed ? directions : prev;
+                });
+                setPopupMaxHeights(prev => {
+                    const changed = Object.keys(maxHeights).some(k => Math.abs((prev[k] ?? 0) - maxHeights[k]) > 20);
+                    return changed ? maxHeights : prev;
+                });
+            }, 500);
         };
-        map.on('moveend', updateDirections);
+        map.on('move', updateDirections);
         updateDirections();
-        return () => { map.off('moveend', updateDirections); };
+        return () => {
+            map.off('move', updateDirections);
+            if (throttleTimer) clearTimeout(throttleTimer);
+        };
     }, [map, offsets]);
 
     return (
@@ -107,7 +127,8 @@ const PhotoMarkers = () => {
                         <Marker
                             key={key}
                             position={[lat, lng + offset]}
-                            icon={createPhotoIcon(photo.thumbnailUrl, isMobile)}
+                            icon={getPhotoIcon(photo.thumbnailUrl, isMobile)}
+                            zIndexOffset={1000}
                             eventHandlers={{
                                 click: () => {
                                     map.panTo([map.getCenter().lat, lng + offset], { animate: true });
@@ -115,7 +136,7 @@ const PhotoMarkers = () => {
                             }}
                         >
                             <Popup
-                                key={`popup-${key}-${openDown}-${maxH}`}
+                                key={`popup-${key}-${openDown}`}
                                 className={`voyalog-photo-popup ${openDown ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
                                 minWidth={isMobile ? undefined : 620}
                                 maxWidth={isMobile ? undefined : 700}
