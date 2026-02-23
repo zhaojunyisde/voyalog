@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Map, Camera, Users, ArrowRight, Globe } from 'lucide-react';
+import { Map, Camera, Users, ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import MapBackground from '../components/MapBackground';
@@ -85,7 +85,7 @@ export const LandingPage: React.FC = () => {
                             fontWeight: '600', fontSize: '0.875rem', marginBottom: '1rem',
                             border: '1px solid var(--border-color)'
                         }}>
-                            <Globe size={16} /> NEXT GENERATION TRAVEL LOG
+                            <img src="/logo.svg" alt="" style={{ width: '18px', height: '18px' }} /> NEXT GENERATION TRAVEL LOG
                         </div>
 
                         <h1 style={{ fontSize: '5rem', fontWeight: '800', letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1.1 }}>
