@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
                     padding: '1rem',
                     textAlign: 'center',
                     color: 'var(--text-secondary)',
-                    zIndex: 10,
+                    zIndex: 1,
                     fontSize: '0.85rem',
                     pointerEvents: 'none',
                 }}

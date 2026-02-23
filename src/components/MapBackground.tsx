@@ -99,6 +99,10 @@ const PhotoMarkers = () => {
                     const key = `${photo.id}-${offset}`;
                     const openDown = popupDirections[key] ?? false;
                     const maxH = popupMaxHeights[key] ?? 400;
+                    // Scale width proportionally when height is constrained
+                    const idealH = 350;
+                    const scale = Math.min(1, maxH / idealH);
+                    const popupW = isMobile ? `${Math.round(75 * scale)}vw` : 'auto';
                     return (
                         <Marker
                             key={key}
@@ -123,8 +127,8 @@ const PhotoMarkers = () => {
                                     flexDirection: isMobile ? 'column' : 'row',
                                     margin: '0',
                                     minWidth: isMobile ? 'auto' : '620px',
-                                    width: isMobile ? '75vw' : 'auto',
-                                    maxWidth: isMobile ? '75vw' : 'none',
+                                    width: isMobile ? popupW : 'auto',
+                                    maxWidth: isMobile ? popupW : 'none',
                                     maxHeight: isMobile ? `${maxH}px` : 'none',
                                     overflow: 'hidden'
                                 }}>
