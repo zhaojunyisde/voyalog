@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-main: 'JetBrains Mono', monospace;
+  --font-display: 'JetBrains Mono', monospace;
+  /* Keep it consistent */
+
+  /* Original Palette */
+  --bg-primary: #fdfcf0;
+  --bg-secondary: #f4f3e6;
+  --text-primary: #2f4f4f;
+  --text-secondary: rgba(47, 79, 79, 0.7);
+  --accent: #008080;
+  /* Teal */
+  --accent-light: rgba(0, 128, 128, 0.1);
+  --border-color: rgba(47, 79, 79, 0.15);
+
+  --container-max: 900px;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #242424;
+    --text-primary: #e0e0e0;
+    --text-secondary: rgba(224, 224, 224, 0.7);
+    --accent: #4db6ac;
+    --border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  transition: color 0.2s ease;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.wavy-link {
+  text-decoration: underline wavy var(--accent);
+}
+
+.solid-link {
+  text-decoration: underline solid var(--accent);
+}
+
+.nav-link {
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.2rem 0;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  text-decoration: underline solid var(--accent);
+}
+
+.nav-link.active {
+  text-decoration: underline wavy var(--accent);
+}
+
+section {
+  padding: 4rem 0;
+}
+
+/* Utilities for Glassmorphism (adapted for light theme) */
+.glass {
+  background: rgba(253, 252, 240, 0.85);
+  /* Slightly more opaque for navbar reading */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(26, 26, 26, 0.85);
+  }
+}
+
+.glass-panel {
+  background: var(--bg-secondary);
+  /* Matching the card aesthetic slightly better than complete glass */
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Darkening the map and adding a more vintage/sepia feel */
+.map-sepia-filter {
+  background-color: var(--bg-primary) !important;
+}
+
+.map-sepia-filter .leaflet-tile-container {
+  filter: brightness(0.9) contrast(1.1) saturate(0.8) sepia(0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .map-sepia-filter {
+    background-color: #1a1a1a !important;
+  }
+
+  .map-sepia-filter .leaflet-tile-container {
+    filter: invert(100%) hue-rotate(180deg) brightness(0.8) contrast(1.2) grayscale(0.2);
+  }
+}
+
+.custom-photo-marker {
+  background: none;
+  border: none;
+}
+
+/* Custom Photo Popup Styling */
+.voyalog-photo-popup {
+  max-width: none !important;
+}
+
+.voyalog-photo-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-main);
+  padding: 0;
+  overflow: hidden;
+  max-width: none !important;
+}
+
+.voyalog-photo-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+.voyalog-photo-popup .leaflet-popup-tip {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+}
+
+.voyalog-photo-popup .leaflet-popup-close-button {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 1.4rem;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.voyalog-photo-popup .leaflet-popup-close-button:hover {
+  color: var(--accent) !important;
+  transform: scale(1.2) rotate(90deg);
+}
+
+/* Downward Popup Styling */
+.popup-down {
+  bottom: auto !important;
+  top: 0 !important;
+  margin-top: 35px;
+  margin-bottom: 0 !important;
+}
+
+.popup-down .leaflet-popup-tip-container {
+  top: -20px;
+  bottom: auto;
+}
+
+.popup-down .leaflet-popup-tip {
+  transform: rotate(225deg);
+  margin-top: 10px;
+}

@@ -1,0 +1,66 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Compass } from 'lucide-react';
+
+export const Navbar: React.FC = () => (
+    <nav className="glass" style={{
+        position: 'fixed',
+        top: '0', left: '0', right: '0',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1.2rem 4rem',
+        zIndex: 100,
+        pointerEvents: 'none'
+    }}>
+        <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.5rem', fontFamily: 'var(--font-main)' }}>
+            <div style={{
+                background: 'var(--accent)',
+                padding: '0.4rem',
+                borderRadius: '0.5rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+                <Compass size={24} color="var(--bg-primary)" />
+            </div>
+            <span>VOYALOG</span>
+        </div>
+        <div style={{ pointerEvents: 'auto', display: 'flex', gap: '2rem', alignItems: 'center', fontWeight: '500', fontFamily: 'var(--font-main)' }}>
+            <Link to="/explore" className="nav-link">Explore</Link>
+            <Link to="/about" className="nav-link">About</Link>
+            <Link to="/login" style={{
+                padding: '0.6rem 1.4rem',
+                borderRadius: '2rem',
+                backgroundColor: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                transition: 'all 0.3s ease',
+                color: 'var(--text-primary)'
+            }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--text-primary)';
+                    e.currentTarget.style.color = 'var(--bg-primary)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                }}
+            >Sign In</Link>
+            <Link to="/signup" style={{
+                padding: '0.6rem 1.4rem',
+                borderRadius: '2rem',
+                background: 'var(--accent)',
+                color: 'var(--bg-primary)',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
+            }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                }}
+            >Get Started</Link>
+        </div>
+    </nav>
+);
