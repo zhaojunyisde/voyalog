@@ -62,125 +62,162 @@ const PhotoMarkers = () => {
         };
     }, [map]);
 
+    const [popupDirections, setPopupDirections] = useState<Record<string, boolean>>({});
+    const [popupMaxHeights, setPopupMaxHeights] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        const updateDirections = () => {
+            const mapHeight = map.getSize().y;
+            const directions: Record<string, boolean> = {};
+            const maxHeights: Record<string, number> = {};
+            SAMPLE_PHOTOS.forEach(photo => {
+                const [lat, lng] = photo.coordinates;
+                offsets.forEach(offset => {
+                    const key = `${photo.id}-${offset}`;
+                    const point = map.latLngToContainerPoint([lat, lng + offset]);
+                    const isInTopHalf = point.y < mapHeight / 2;
+                    directions[key] = isInTopHalf;
+                    const availableH = isInTopHalf
+                        ? mapHeight - point.y - 60
+                        : point.y - 60;
+                    maxHeights[key] = Math.max(availableH, 150);
+                });
+            });
+            setPopupDirections(directions);
+            setPopupMaxHeights(maxHeights);
+        };
+        map.on('moveend', updateDirections);
+        updateDirections();
+        return () => { map.off('moveend', updateDirections); };
+    }, [map, offsets]);
+
     return (
         <>
             {SAMPLE_PHOTOS.flatMap(photo => {
                 const [lat, lng] = photo.coordinates;
-                return offsets.map(offset => (
-                    <Marker
-                        key={`${photo.id}-${offset}`}
-                        position={[lat, lng + offset]}
-                        icon={createPhotoIcon(photo.thumbnailUrl, isMobile)}
-                        eventHandlers={{
-                            click: () => {
-                                map.panTo([map.getCenter().lat, lng + offset], { animate: true });
-                            }
-                        }}
-                    >
-                        <Popup
-                            className={`voyalog-photo-popup ${!isMobile && lat > 20 ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
-                            minWidth={isMobile ? undefined : 620}
-                            maxWidth={isMobile ? undefined : 700}
-                            offset={isMobile ? [0, -20] : (lat > 20 ? [0, 20] : [0, -20])}
-                            autoPan={false}
+                return offsets.map(offset => {
+                    const key = `${photo.id}-${offset}`;
+                    const openDown = popupDirections[key] ?? false;
+                    const maxH = popupMaxHeights[key] ?? 400;
+                    return (
+                        <Marker
+                            key={key}
+                            position={[lat, lng + offset]}
+                            icon={createPhotoIcon(photo.thumbnailUrl, isMobile)}
+                            eventHandlers={{
+                                click: () => {
+                                    map.panTo([map.getCenter().lat, lng + offset], { animate: true });
+                                }
+                            }}
                         >
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: isMobile ? 'column' : 'row',
-                                margin: '0',
-                                minWidth: isMobile ? 'auto' : '620px',
-                                width: isMobile ? '75vw' : 'auto',
-                                maxWidth: isMobile ? '75vw' : 'none'
-                            }}>
-                                {/* Left: Image */}
+                            <Popup
+                                key={`popup-${key}-${openDown}-${maxH}`}
+                                className={`voyalog-photo-popup ${openDown ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
+                                minWidth={isMobile ? undefined : 620}
+                                maxWidth={isMobile ? undefined : 700}
+                                offset={openDown ? [0, 20] : [0, -20]}
+                                autoPan={false}
+                            >
                                 <div style={{
-                                    position: 'relative',
-                                    flex: isMobile ? 'none' : '1 1 60%',
-                                    minWidth: 0
-                                }}>
-                                    <img
-                                        src={photo.fullImageUrl}
-                                        alt={photo.locationName}
-                                        style={{
-                                            width: '100%',
-                                            height: isMobile ? 'auto' : '100%',
-                                            maxHeight: isMobile ? '50vh' : 'none',
-                                            objectFit: 'cover',
-                                            display: 'block'
-                                        }}
-                                    />
-                                    <a
-                                        href={photo.fullImageUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                            position: 'absolute',
-                                            bottom: isMobile ? '8px' : '12px',
-                                            right: isMobile ? '8px' : '12px',
-                                            background: 'rgba(0,0,0,0.5)',
-                                            backdropFilter: 'blur(4px)',
-                                            color: 'white',
-                                            padding: isMobile ? '8px' : '6px 12px',
-                                            borderRadius: '20px',
-                                            textDecoration: 'none',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: isMobile ? '0' : '6px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600',
-                                            border: '1px solid rgba(255,255,255,0.2)',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'rgba(0,0,0,0.5)';
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                        }}
-                                    >
-                                        <ExternalLink size={isMobile ? 16 : 14} />{!isMobile && ' Full Res'}
-                                    </a>
-                                </div>
-                                {/* Right: Metadata Panel */}
-                                <div style={{
-                                    flex: isMobile ? 'none' : '0 0 220px',
-                                    padding: isMobile ? '0.75rem 1rem' : '28px 24px',
-                                    background: 'var(--bg-primary)',
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    gap: isMobile ? '0.25rem' : '0.5rem',
-                                    borderLeft: isMobile ? 'none' : '1px solid var(--border-color)',
-                                    borderTop: isMobile ? '1px solid var(--border-color)' : 'none'
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    margin: '0',
+                                    minWidth: isMobile ? 'auto' : '620px',
+                                    width: isMobile ? '75vw' : 'auto',
+                                    maxWidth: isMobile ? '75vw' : 'none',
+                                    maxHeight: isMobile ? `${maxH}px` : 'none',
+                                    overflow: 'hidden'
                                 }}>
+                                    {/* Left: Image */}
                                     <div style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                        color: 'var(--accent)', fontSize: isMobile ? '0.6rem' : '0.7rem',
-                                        fontWeight: '700', letterSpacing: '0.1em',
-                                        textTransform: 'uppercase'
+                                        position: 'relative',
+                                        flex: isMobile ? 'none' : '1 1 60%',
+                                        minWidth: 0
                                     }}>
-                                        <span style={{ width: '16px', height: '1px', background: 'var(--accent)', display: 'inline-block' }}></span>
-                                        {photo.date}
+                                        <img
+                                            src={photo.fullImageUrl}
+                                            alt={photo.locationName}
+                                            style={{
+                                                width: '100%',
+                                                height: isMobile ? 'auto' : '100%',
+                                                maxHeight: isMobile ? `${Math.max(maxH - 80, 100)}px` : 'none',
+                                                objectFit: 'cover',
+                                                display: 'block'
+                                            }}
+                                        />
+                                        <a
+                                            href={photo.fullImageUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                position: 'absolute',
+                                                bottom: isMobile ? '8px' : '12px',
+                                                right: isMobile ? '8px' : '12px',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                backdropFilter: 'blur(4px)',
+                                                color: 'white',
+                                                padding: isMobile ? '8px' : '6px 12px',
+                                                borderRadius: '20px',
+                                                textDecoration: 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: isMobile ? '0' : '6px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '600',
+                                                border: '1px solid rgba(255,255,255,0.2)',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'rgba(0,0,0,0.5)';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                            }}
+                                        >
+                                            <ExternalLink size={isMobile ? 16 : 14} />{!isMobile && ' Full Res'}
+                                        </a>
                                     </div>
-                                    <h4 style={{
-                                        margin: '0', fontWeight: '800',
-                                        color: 'var(--text-primary)', fontSize: isMobile ? '0.9rem' : '1.3rem',
-                                        fontFamily: 'var(--font-main)', lineHeight: '1.3'
-                                    }}>{photo.locationName}</h4>
-                                    {photo.description && (
-                                        <p style={{
-                                            fontSize: isMobile ? '0.7rem' : '0.8rem', color: 'var(--text-secondary)',
-                                            fontStyle: 'italic', lineHeight: isMobile ? '1.3' : '1.5', margin: '0'
-                                        }}>"{photo.description}"</p>
-                                    )}
+                                    {/* Right: Metadata Panel */}
+                                    <div style={{
+                                        flex: isMobile ? 'none' : '0 0 220px',
+                                        padding: isMobile ? '0.75rem 1rem' : '28px 24px',
+                                        background: 'var(--bg-primary)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                        gap: isMobile ? '0.25rem' : '0.5rem',
+                                        borderLeft: isMobile ? 'none' : '1px solid var(--border-color)',
+                                        borderTop: isMobile ? '1px solid var(--border-color)' : 'none'
+                                    }}>
+                                        <div style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                            color: 'var(--accent)', fontSize: isMobile ? '0.6rem' : '0.7rem',
+                                            fontWeight: '700', letterSpacing: '0.1em',
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            <span style={{ width: '16px', height: '1px', background: 'var(--accent)', display: 'inline-block' }}></span>
+                                            {photo.date}
+                                        </div>
+                                        <h4 style={{
+                                            margin: '0', fontWeight: '800',
+                                            color: 'var(--text-primary)', fontSize: isMobile ? '0.9rem' : '1.3rem',
+                                            fontFamily: 'var(--font-main)', lineHeight: '1.3'
+                                        }}>{photo.locationName}</h4>
+                                        {photo.description && (
+                                            <p style={{
+                                                fontSize: isMobile ? '0.7rem' : '0.8rem', color: 'var(--text-secondary)',
+                                                fontStyle: 'italic', lineHeight: isMobile ? '1.3' : '1.5', margin: '0'
+                                            }}>"{photo.description}"</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ));
+                            </Popup>
+                        </Marker>
+                    );
+                });
             })}
         </>
     );
