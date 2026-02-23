@@ -287,6 +287,7 @@ section {
   right: 12px !important;
   z-index: 10;
   transition: all 0.3s ease;
+  cursor: pointer !important;
 }
 
 .voyalog-photo-popup .leaflet-popup-close-button:hover {
@@ -300,6 +301,24 @@ section {
   top: 0 !important;
   margin-top: 35px;
   margin-bottom: 0 !important;
+}
+
+/* Mobile specific close button improvements */
+.popup-mobile .leaflet-popup-close-button {
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  top: 4px !important;
+  right: 4px !important;
+  font-size: 1.8rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+
+.popup-mobile .leaflet-popup-close-button:hover {
+  transform: none !important;
 }
 
 .popup-down .leaflet-popup-tip-container {
