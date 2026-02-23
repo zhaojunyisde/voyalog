@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Background with rounded corners -->
-  <rect width="512" height="512" rx="128" fill="#006666"/>
+  <!-- Rounded teal background -->
+  <rect width="512" height="512" rx="160" fill="#006666"/>
   
-  <!-- Main bold compass needle pointing North -->
-  <path d="M256 120 L340 340 L256 300 L172 340 Z" fill="#FDFCF0"/>
-  
-  <!-- Central lens/pin element -->
-  <circle cx="256" cy="256" r="45" fill="#006666" stroke="#FDFCF0" stroke-width="12"/>
-  <circle cx="256" cy="256" r="15" fill="#FDFCF0"/>
+  <!-- Abstract "V" - Map fold / Compass needle -->
+  <!-- Left wing - slightly darker for depth -->
+  <path d="M140 140 L256 400 L256 280 Z" fill="#FDFCF0" opacity="0.8"/>
+  <!-- Right wing - bright cream -->
+  <path d="M372 140 L256 400 L256 280 Z" fill="#FDFCF0"/>
 </svg>
