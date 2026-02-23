@@ -2,8 +2,8 @@
   <!-- Rounded teal background -->
   <rect width="512" height="512" rx="160" fill="#006666"/>
   
-  <!-- Rotated Clean "Folded V" (Larger, 10 degree rotation) -->
-  <g transform="rotate(10 256 256)">
+  <!-- Rotated Clean "Folded V" (Larger, 30 degree rotation) -->
+  <g transform="rotate(30 256 256)">
     <!-- Left fold (slightly darker) -->
     <path d="M110 100 L256 460 L256 330 Z" fill="#FDFCF0" opacity="0.8"/>
     <!-- Right fold (clean cream) -->
