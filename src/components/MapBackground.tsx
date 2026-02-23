@@ -78,10 +78,10 @@ const PhotoMarkers = () => {
                         }}
                     >
                         <Popup
-                            className={`voyalog-photo-popup ${lat > 20 ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
+                            className={`voyalog-photo-popup ${!isMobile && lat > 20 ? 'popup-down' : ''} ${isMobile ? 'popup-mobile' : ''}`}
                             minWidth={isMobile ? undefined : 620}
                             maxWidth={isMobile ? undefined : 700}
-                            offset={lat > 20 ? [0, 20] : [0, -20]}
+                            offset={isMobile ? [0, -20] : (lat > 20 ? [0, 20] : [0, -20])}
                             autoPan={false}
                         >
                             <div style={{
@@ -89,8 +89,8 @@ const PhotoMarkers = () => {
                                 flexDirection: isMobile ? 'column' : 'row',
                                 margin: '0',
                                 minWidth: isMobile ? 'auto' : '620px',
-                                width: isMobile ? '80vw' : 'auto',
-                                maxWidth: isMobile ? '80vw' : 'none'
+                                width: isMobile ? '75vw' : 'auto',
+                                maxWidth: isMobile ? '75vw' : 'none'
                             }}>
                                 {/* Left: Image */}
                                 <div style={{
@@ -104,8 +104,8 @@ const PhotoMarkers = () => {
                                         style={{
                                             width: '100%',
                                             height: isMobile ? 'auto' : '100%',
-                                            maxHeight: isMobile ? '60vh' : 'none',
-                                            objectFit: isMobile ? 'contain' : 'cover',
+                                            maxHeight: isMobile ? '50vh' : 'none',
+                                            objectFit: 'cover',
                                             display: 'block'
                                         }}
                                     />
