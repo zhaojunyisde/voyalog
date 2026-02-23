@@ -361,6 +361,24 @@ export default function MapBackground() {
                 zIndex: 10,
                 pointerEvents: 'none' // Ensure clicks pass through the overlay to the map
             }}></div>
+
+            {/* Footer placed here to be on top of map but below popups */}
+            <footer
+                style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '1rem',
+                    textAlign: 'center',
+                    color: 'var(--text-secondary)',
+                    zIndex: 20, // Above map (0) and overlay (10), but below popups (700+)
+                    fontSize: '0.85rem',
+                    pointerEvents: 'none',
+                }}
+            >
+                <p>&copy; 2026 Voyalog. All rights reserved.</p>
+            </footer>
         </div>
     );
 }

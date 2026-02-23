@@ -86,24 +86,6 @@ export const LandingPage: React.FC = () => {
                     />
                 )}
             </div>
-
-            {/* Footer stays outside the sticky container */}
-            <footer
-                style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '1rem',
-                    textAlign: 'center',
-                    color: 'var(--text-secondary)',
-                    zIndex: 0,
-                    fontSize: '0.85rem',
-                    pointerEvents: 'none',
-                }}
-            >
-                <p>&copy; 2026 Voyalog. All rights reserved.</p>
-            </footer>
         </div>
     );
 };
