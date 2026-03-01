@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import heic2any from 'heic2any';
 import { getUploadUrl, uploadToS3, confirmPhoto } from '../services/api';
 import type { PhotoMeta } from '../services/api';
 import { defaultMeta, extractExifMeta, reverseGeocode } from '../utils/photoUtils';
@@ -128,16 +127,8 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
             if (entries[i].status === 'done') continue;
             setEntries(prev => prev.map((e, idx) => idx === i ? { ...e, status: 'uploading' } : e));
             try {
-                let file = entries[i].file;
-                const isHeic = file.type === 'image/heic' || file.type === 'image/heif'
-                    || /\.(heic|heif)$/i.test(file.name);
-                if (isHeic) {
-                    const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
-                    const converted = Array.isArray(blob) ? blob[0] : blob;
-                    file = new File([converted], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
-                }
-                const { photo_id, upload_url } = await getUploadUrl(boardId, file.name, accessToken, file.type, file.size);
-                await uploadToS3(upload_url, file);
+                const { photo_id, upload_url } = await getUploadUrl(boardId, entries[i].file.name, accessToken, entries[i].file.type, entries[i].file.size);
+                await uploadToS3(upload_url, entries[i].file);
                 await confirmPhoto(boardId, photo_id, accessToken, entries[i].meta);
                 setEntries(prev => prev.map((e, idx) => idx === i ? { ...e, status: 'done' } : e));
             } catch (err) {

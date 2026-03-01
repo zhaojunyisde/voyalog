@@ -13,7 +13,6 @@
     "clsx": "^2.1.1",
     "exifreader": "^4.36.2",
     "framer-motion": "^12.34.3",
-    "heic2any": "^0.0.4",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
     "react": "^19.2.0",
