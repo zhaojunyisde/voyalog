@@ -24,6 +24,19 @@ export async function apiGet<T = unknown>(path: string, token?: string): Promise
   return data as T;
 }
 
+export async function apiPatch<T = unknown>(path: string, body: object, token?: string): Promise<T> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail ?? 'Request failed');
+  return data as T;
+}
+
 export async function apiDelete<T = unknown>(path: string, token?: string): Promise<T> {
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -42,6 +55,8 @@ export interface Photo {
   url: string;
   status: string;
   uploaded_at: string;
+  created_at?: string;
+  updated_at?: string;
   // optional metadata
   title?: string;
   date?: string;
@@ -88,6 +103,15 @@ export async function confirmPhoto(
   meta?: { title: string; date: string; location: string; description: string },
 ): Promise<void> {
   await apiPost(`/boards/${boardId}/photos/${photoId}/confirm`, meta ?? {}, token);
+}
+
+export async function updatePhoto(
+  boardId: string,
+  photoId: string,
+  token: string,
+  meta: Partial<PhotoMeta>,
+): Promise<void> {
+  await apiPatch(`/boards/${boardId}/photos/${photoId}`, meta, token);
 }
 
 export async function deletePhoto(boardId: string, photoId: string, token: string): Promise<void> {
