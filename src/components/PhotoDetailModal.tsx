@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { updatePhoto } from '../services/api';
 import type { Photo, PhotoMeta } from '../services/api';
+import { useIsMobile } from '../hooks/useMobile';
 
 export interface PhotoDetailModalProps {
     photo: Photo | null;
@@ -12,6 +13,7 @@ export interface PhotoDetailModalProps {
 }
 
 export function PhotoDetailModal({ photo, boardId, accessToken, onClose, onSaved, onDelete }: PhotoDetailModalProps) {
+    const isMobile = useIsMobile();
     const [form, setForm] = useState<PhotoMeta>({ title: '', date: '', location: '', description: '' });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -96,21 +98,22 @@ export function PhotoDetailModal({ photo, boardId, accessToken, onClose, onSaved
                 width: '100%', maxWidth: '820px',
                 background: 'var(--bg-primary)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '1.5rem',
+                borderRadius: isMobile ? '1rem' : '1.5rem',
                 boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
                 overflow: 'hidden',
-                display: 'flex', flexDirection: 'row',
+                display: 'flex', flexDirection: isMobile ? 'column' : 'row',
                 animation: 'slideUp 0.25s cubic-bezier(0.16,1,0.3,1)',
                 fontFamily: 'var(--font-main)',
-                maxHeight: '90vh',
+                maxHeight: '95vh',
+                height: isMobile ? '95vh' : 'auto',
             }}>
 
                 {/* Left: image */}
-                <div style={{ flex: '0 0 55%', position: 'relative', background: '#000', minHeight: '420px' }}>
+                <div style={{ flex: isMobile ? '0 0 40%' : '0 0 55%', position: 'relative', background: '#000', minHeight: isMobile ? '0' : '420px', display: 'flex' }}>
                     <img
                         src={photo.url}
                         alt={photo.title ?? photo.filename}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', margin: 'auto' }}
                     />
                 </div>
 
@@ -178,14 +181,15 @@ export function PhotoDetailModal({ photo, boardId, accessToken, onClose, onSaved
 
                     {/* Footer */}
                     <div style={{
-                        flexShrink: 0, padding: '0.85rem 1.25rem',
+                        flexShrink: 0, padding: isMobile ? '0.75rem 1rem' : '0.85rem 1.25rem',
                         borderTop: '1px solid var(--border-color)',
                         display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        flexWrap: 'wrap',
                     }}>
                         {/* Delete */}
                         {confirmDelete ? (
                             <>
-                                <span style={{ fontSize: '0.75rem', color: '#dc2626', flex: 1 }}>Delete this photo?</span>
+                                <span style={{ fontSize: '0.75rem', color: '#dc2626', flex: 1, whiteSpace: 'nowrap' }}>Delete this photo?</span>
                                 <button onClick={() => setConfirmDelete(false)} style={{ padding: '0.4rem 0.9rem', borderRadius: '2rem', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'var(--font-main)' }}>No</button>
                                 <button onClick={handleDelete} style={{ padding: '0.4rem 0.9rem', borderRadius: '2rem', border: 'none', background: '#dc2626', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-main)' }}>Yes, delete</button>
                             </>
@@ -194,7 +198,7 @@ export function PhotoDetailModal({ photo, boardId, accessToken, onClose, onSaved
                                 <button onClick={() => setConfirmDelete(true)} disabled={saving} style={{ padding: '0.4rem 0.75rem', borderRadius: '2rem', border: '1px solid rgba(220,38,38,0.4)', background: 'transparent', color: '#dc2626', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'var(--font-main)' }}>Delete</button>
                                 <span style={{ flex: 1, fontSize: '0.75rem', color: '#dc2626' }}>{error}</span>
                                 <button onClick={onClose} disabled={saving} style={{ padding: '0.4rem 0.9rem', borderRadius: '2rem', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'var(--font-main)' }}>Cancel</button>
-                                <button onClick={handleSave} disabled={saving || !isDirty} style={{ padding: '0.4rem 1.1rem', borderRadius: '2rem', border: 'none', background: saving || !isDirty ? 'rgba(0,128,128,0.35)' : 'var(--accent)', color: 'var(--bg-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: saving || !isDirty ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-main)', transition: 'all 0.2s' }}>
+                                <button onClick={handleSave} disabled={saving || !isDirty} style={{ padding: '0.4rem 1.1rem', borderRadius: '2rem', border: 'none', background: saving || !isDirty ? 'rgba(0,128,128,0.35)' : 'var(--accent)', color: 'var(--bg-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: saving || !isDirty ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-main)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
                                     {saving ? 'Saving…' : 'Save'}
                                 </button>
                             </>

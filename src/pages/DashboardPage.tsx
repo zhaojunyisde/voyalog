@@ -8,10 +8,12 @@ import { LoadingScreen } from '../components/LoadingScreen';
 import { UploadModal } from '../components/UploadModal';
 import { PhotoDetailModal } from '../components/PhotoDetailModal';
 import { DashboardMapView } from '../components/DashboardMapView';
+import { useIsMobile } from '../hooks/useMobile';
 
 export function DashboardPage() {
   const { user, tokens, loading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const [board, setBoard] = useState<Board | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -275,8 +277,7 @@ export function DashboardPage() {
         />
       )}
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '5rem 1.5rem 4rem' }}>
-
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '5rem 1rem 4rem' }}>
         {/* ── Hero Header ── */}
         <div style={{
           position: 'relative',
@@ -380,6 +381,7 @@ export function DashboardPage() {
                 <button
                   className="upload-btn"
                   onClick={() => setUploadModalOpen(true)}
+                  style={{ width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}
                 >
                   <span style={{ fontSize: '1rem', lineHeight: 1 }}>＋</span>
                   Upload Photos

@@ -48,12 +48,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onSignIn, onJoin }) => {
             pointerEvents: 'none',
         }}>
             {/* Logo */}
-            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.25rem', fontFamily: 'var(--font-main)' }}>
+            <Link to="/" style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800', fontSize: '1.25rem', fontFamily: 'var(--font-main)', textDecoration: 'none', color: 'inherit' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src="/logo.svg" alt="Voyalog Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <span style={{ letterSpacing: '-0.02em' }}>VOYALOG</span>
-            </div>
+            </Link>
 
             {/* Right side nav */}
             <div className="nav-links" style={{ pointerEvents: 'auto' }}>

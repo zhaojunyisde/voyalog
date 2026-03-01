@@ -5,6 +5,7 @@ import { defaultMeta, extractExifMeta, reverseGeocode } from '../utils/photoUtil
 import type { FileEntry } from '../utils/photoUtils';
 import { inputStyle } from '../utils/styles';
 import { LocationPickerMap } from './LocationPickerMap';
+import { useIsMobile } from '../hooks/useMobile';
 
 export interface UploadModalProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ export interface UploadModalProps {
 }
 
 export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken }: UploadModalProps) {
+    const isMobile = useIsMobile();
     const [step, setStep] = useState<'pick' | 'meta'>('pick');
     const [entries, setEntries] = useState<FileEntry[]>([]);
     const [dragOver, setDragOver] = useState(false);
@@ -167,10 +169,11 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
         >
             <div style={{
                 width: '100%',
-                maxWidth: step === 'meta' ? '780px' : '520px',
+                maxWidth: step === 'meta' ? (isMobile ? '100%' : '780px') : (isMobile ? '100%' : '520px'),
+                maxHeight: isMobile ? '95vh' : 'auto',
                 background: 'var(--bg-primary)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '1.5rem',
+                borderRadius: isMobile ? '1rem' : '1.5rem',
                 boxShadow: '0 32px 80px rgba(0,0,0,0.3)',
                 overflow: 'hidden',
                 animation: 'slideUp 0.25s cubic-bezier(0.16,1,0.3,1)',
@@ -231,7 +234,7 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
                             style={{
                                 border: `2px dashed ${dragOver ? 'var(--accent)' : 'var(--border-color)'}`,
                                 borderRadius: '1rem',
-                                padding: entries.length ? '1rem' : '3rem 1.5rem',
+                                padding: entries.length ? '1rem' : (isMobile ? '2rem 1rem' : '3rem 1.5rem'),
                                 textAlign: 'center',
                                 cursor: 'pointer',
                                 background: dragOver ? 'var(--accent-light)' : 'transparent',
@@ -330,15 +333,17 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
 
                 {/* ── Step 2: Metadata ── */}
                 {step === 'meta' && (
-                    <div style={{ display: 'flex', height: '520px' }}>
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: isMobile ? 'calc(95vh - 65px)' : '520px' }}>
 
                         {/* Left: thumbnail filmstrip */}
                         <div style={{
-                            width: '110px', flexShrink: 0,
-                            borderRight: '1px solid var(--border-color)',
-                            overflowY: 'auto',
-                            padding: '0.75rem 0.5rem',
-                            display: 'flex', flexDirection: 'column', gap: '0.5rem',
+                            width: isMobile ? '100%' : '110px', flexShrink: 0,
+                            borderRight: isMobile ? 'none' : '1px solid var(--border-color)',
+                            borderBottom: isMobile ? '1px solid var(--border-color)' : 'none',
+                            overflowX: isMobile ? 'auto' : 'hidden',
+                            overflowY: isMobile ? 'hidden' : 'auto',
+                            padding: '0.75rem',
+                            display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '0.5rem',
                         }}>
                             {entries.map((entry, idx) => (
                                 <div
@@ -347,6 +352,8 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
                                     style={{
                                         position: 'relative',
                                         aspectRatio: '1',
+                                        width: isMobile ? '64px' : 'auto',
+                                        height: isMobile ? '64px' : 'auto',
                                         borderRadius: '0.5rem',
                                         overflow: 'hidden',
                                         cursor: 'pointer',
@@ -387,23 +394,25 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
                         {active && (
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                 {/* Preview strip */}
-                                <div style={{ height: '180px', flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
-                                    <img
-                                        src={active.preview}
-                                        alt={active.file.name}
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                                    />
-                                    <div style={{
-                                        position: 'absolute', inset: 0,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)',
-                                        pointerEvents: 'none',
-                                    }} />
-                                    <div style={{ position: 'absolute', bottom: '0.75rem', left: '1rem', right: '1rem' }}>
-                                        <p style={{ color: '#fff', fontSize: '0.75rem', opacity: 0.8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-                                            {active.file.name} · {(active.file.size / 1024).toFixed(0)} KB
-                                        </p>
+                                {!isMobile && (
+                                    <div style={{ height: '180px', flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
+                                        <img
+                                            src={active.preview}
+                                            alt={active.file.name}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                        />
+                                        <div style={{
+                                            position: 'absolute', inset: 0,
+                                            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)',
+                                            pointerEvents: 'none',
+                                        }} />
+                                        <div style={{ position: 'absolute', bottom: '0.75rem', left: '1rem', right: '1rem' }}>
+                                            <p style={{ color: '#fff', fontSize: '0.75rem', opacity: 0.8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                                                {active.file.name} · {(active.file.size / 1024).toFixed(0)} KB
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Form fields */}
                                 <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -602,6 +611,7 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
                                             cursor: (uploading || allDone) ? 'not-allowed' : 'pointer',
                                             fontFamily: 'var(--font-main)',
                                             transition: 'all 0.2s',
+                                            whiteSpace: 'nowrap',
                                         }}
                                     >
                                         {uploading ? 'Uploading…' : allDone ? 'Done ✓' : `Upload (${entries.length})`}
@@ -612,6 +622,6 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

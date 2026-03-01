@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 import { apiPost } from '../services/api';
+import { useIsMobile } from '../hooks/useMobile';
 
 // ─── Shared Styles ────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ function ErrorBox({ message }: { message: string }) {
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialView = 'login', onClose }) => {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     // View state
     const [view, setView] = useState<ModalView>(initialView);
@@ -289,7 +291,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialView = 'log
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '1.5rem',
-                    padding: '2.5rem',
+                    padding: isMobile ? '1.5rem' : '2.5rem',
                     width: '100%',
                     maxWidth: '420px',
                     boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
