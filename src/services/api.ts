@@ -61,6 +61,8 @@ export interface Photo {
   // optional metadata
   title?: string;
   date?: string;
+  latitude?: number;
+  longitude?: number;
   location?: string;
   description?: string;
 }
@@ -68,6 +70,8 @@ export interface Photo {
 export interface PhotoMeta {
   title: string;
   date: string;
+  latitude?: number;
+  longitude?: number;
   location: string;
   description: string;
 }
@@ -110,9 +114,9 @@ export async function confirmPhoto(
   boardId: string,
   photoId: string,
   token: string,
-  meta?: { title: string; date: string; location: string; description: string },
+  meta: PhotoMeta,
 ): Promise<void> {
-  await apiPost(`/boards/${boardId}/photos/${photoId}/confirm`, meta ?? {}, token);
+  await apiPost(`/boards/${boardId}/photos/${photoId}/confirm`, meta, token);
 }
 
 export async function updatePhoto(
