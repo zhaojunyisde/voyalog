@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 5174,
     proxy: {
       // Forward every request that isn't a static asset to the local backend.
       // This runs server-side, so CORS is never an issue.

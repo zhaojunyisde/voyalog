@@ -92,8 +92,15 @@ export async function getUploadUrl(
 }
 
 export async function uploadToS3(uploadUrl: string, file: File): Promise<void> {
-  const res = await fetch(uploadUrl, { method: 'PUT', body: file });
-  if (!res.ok) throw new Error('Upload to S3 failed');
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Upload to S3 failed (${res.status})${text ? ': ' + text : ''}`);
+  }
 }
 
 export async function confirmPhoto(
