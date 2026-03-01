@@ -15,7 +15,6 @@ import {
   type PhotoMeta,
 } from '../services/api';
 
-const PHOTO_LIMIT = 5;
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -111,10 +110,9 @@ interface UploadModalProps {
   onUploadDone: () => void;
   boardId: string;
   accessToken: string;
-  remaining: number;
 }
 
-function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken, remaining }: UploadModalProps) {
+function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken }: UploadModalProps) {
   const [step, setStep] = useState<'pick' | 'meta'>('pick');
   const [entries, setEntries] = useState<FileEntry[]>([]);
   const [dragOver, setDragOver] = useState(false);
@@ -145,8 +143,7 @@ function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken, rema
       status: 'idle',
     }));
 
-    // Clamp to remaining slots
-    setEntries(prev => [...prev, ...newEntries].slice(0, remaining));
+    setEntries(prev => [...prev, ...newEntries]);
 
     // Launch EXIF extraction outside the updater so it only fires once,
     // then match by stable File object reference (not by index).
@@ -168,7 +165,7 @@ function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken, rema
         );
       });
     }
-  }, [remaining]);
+  }, []);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -324,7 +321,7 @@ function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken, rema
                     Drop photos here
                   </p>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                    or click to browse · {remaining} slot{remaining !== 1 ? 's' : ''} remaining
+                    or click to browse
                   </p>
                 </>
               ) : (
@@ -899,9 +896,6 @@ export function DashboardPage() {
     );
   }
 
-  const atLimit = (board?.photo_count ?? 0) >= PHOTO_LIMIT;
-  const remaining = PHOTO_LIMIT - (board?.photo_count ?? 0);
-
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'var(--font-main)' }}>
 
@@ -914,7 +908,6 @@ export function DashboardPage() {
           onUploadDone={refreshBoard}
           boardId={user.board_id}
           accessToken={tokens.access_token}
-          remaining={remaining}
         />
       )}
 
@@ -941,41 +934,40 @@ export function DashboardPage() {
               {board?.name ?? 'My Board'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
-              {board?.photo_count ?? 0} / {PHOTO_LIMIT} photos
+              {board?.photo_count ?? 0} photos
             </p>
           </div>
           <button
-            onClick={() => !atLimit && setUploadModalOpen(true)}
-            disabled={atLimit}
+            onClick={() => setUploadModalOpen(true)}
             style={{
               padding: '0.6rem 1.4rem', borderRadius: '2rem',
-              background: atLimit ? 'rgba(0,128,128,0.4)' : 'var(--accent)',
+              background: 'var(--accent)',
               color: 'var(--bg-primary)', fontWeight: 700,
               fontSize: '0.9rem', border: 'none',
-              cursor: atLimit ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
               fontFamily: 'var(--font-main)',
               transition: 'opacity 0.2s',
             }}
-            onMouseEnter={e => { if (!atLimit) e.currentTarget.style.opacity = '0.88'; }}
+            onMouseEnter={e => { e.currentTarget.style.opacity = '0.88'; }}
             onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
           >
-            {atLimit ? 'Limit reached' : '+ Upload'}
+            + Upload
           </button>
         </div>
 
         {/* Empty state */}
         {photos.length === 0 && (
           <div
-            onClick={() => !atLimit && setUploadModalOpen(true)}
+            onClick={() => setUploadModalOpen(true)}
             style={{
               border: '2px dashed var(--border-color)',
               borderRadius: '1.5rem',
               padding: '4rem 2rem',
               textAlign: 'center',
-              cursor: atLimit ? 'default' : 'pointer',
+              cursor: 'pointer',
               transition: 'border-color 0.2s, background 0.2s',
             }}
-            onMouseEnter={e => { if (!atLimit) { (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--accent)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--accent-light)'; } }}
+            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--accent)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--accent-light)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = ''; (e.currentTarget as HTMLDivElement).style.background = ''; }}
           >
             <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🖼️</div>
