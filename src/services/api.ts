@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+// In dev, VITE_API_URL is '' so requests are relative and proxied by Vite (no CORS).
+// In production, VITE_API_URL is the full API URL.
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
 export async function apiPost<T = unknown>(path: string, body: object, token?: string): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -40,6 +42,18 @@ export interface Photo {
   url: string;
   status: string;
   uploaded_at: string;
+  // optional metadata
+  title?: string;
+  date?: string;
+  location?: string;
+  description?: string;
+}
+
+export interface PhotoMeta {
+  title: string;
+  date: string;
+  location: string;
+  description: string;
 }
 
 export interface Board {
@@ -57,8 +71,9 @@ export async function getUploadUrl(
   boardId: string,
   filename: string,
   token: string,
+  contentType: string = 'image/jpeg',
 ): Promise<{ photo_id: string; upload_url: string }> {
-  return apiPost(`/boards/${boardId}/photos/upload-url`, { filename, content_type: 'image/jpeg' }, token);
+  return apiPost(`/boards/${boardId}/photos/upload-url`, { filename, content_type: contentType }, token);
 }
 
 export async function uploadToS3(uploadUrl: string, file: File): Promise<void> {
@@ -66,8 +81,13 @@ export async function uploadToS3(uploadUrl: string, file: File): Promise<void> {
   if (!res.ok) throw new Error('Upload to S3 failed');
 }
 
-export async function confirmPhoto(boardId: string, photoId: string, token: string): Promise<void> {
-  await apiPost(`/boards/${boardId}/photos/${photoId}/confirm`, {}, token);
+export async function confirmPhoto(
+  boardId: string,
+  photoId: string,
+  token: string,
+  meta?: { title: string; date: string; location: string; description: string },
+): Promise<void> {
+  await apiPost(`/boards/${boardId}/photos/${photoId}/confirm`, meta ?? {}, token);
 }
 
 export async function deletePhoto(boardId: string, photoId: string, token: string): Promise<void> {
