@@ -87,8 +87,9 @@ export async function getUploadUrl(
   filename: string,
   token: string,
   contentType: string = 'image/jpeg',
+  fileSize: number = 0,
 ): Promise<{ photo_id: string; upload_url: string }> {
-  return apiPost(`/boards/${boardId}/photos/upload-url`, { filename, content_type: contentType }, token);
+  return apiPost(`/boards/${boardId}/photos/upload-url`, { filename, content_type: contentType, file_size: fileSize }, token);
 }
 
 export async function uploadToS3(uploadUrl: string, file: File): Promise<void> {

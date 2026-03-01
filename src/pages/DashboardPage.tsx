@@ -202,7 +202,7 @@ function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToken }: Up
       if (entries[i].status === 'done') continue;
       setEntries(prev => prev.map((e, idx) => idx === i ? { ...e, status: 'uploading' } : e));
       try {
-        const { photo_id, upload_url } = await getUploadUrl(boardId, entries[i].file.name, accessToken, entries[i].file.type);
+        const { photo_id, upload_url } = await getUploadUrl(boardId, entries[i].file.name, accessToken, entries[i].file.type, entries[i].file.size);
         await uploadToS3(upload_url, entries[i].file);
         await confirmPhoto(boardId, photo_id, accessToken, entries[i].meta);
         setEntries(prev => prev.map((e, idx) => idx === i ? { ...e, status: 'done' } : e));
