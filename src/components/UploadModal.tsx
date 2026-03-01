@@ -37,7 +37,10 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
     }, [isOpen]);
 
     const addFiles = useCallback((files: File[]) => {
-        const images = files.filter(f => f.type.startsWith('image/'));
+        const isHeicFile = (f: File) =>
+            f.type === 'image/heic' || f.type === 'image/heif' || /\.(heic|heif)$/i.test(f.name);
+
+        const images = files.filter(f => f.type.startsWith('image/') || isHeicFile(f));
         const newEntries: FileEntry[] = images.map(f => ({
             file: f,
             preview: URL.createObjectURL(f),
@@ -48,25 +51,33 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
 
         setEntries(prev => [...prev, ...newEntries]);
 
-        // Launch EXIF extraction outside the updater so it only fires once,
-        // then match by stable File object reference (not by index).
         for (const entry of newEntries) {
-            extractExifMeta(entry.file).then(exifMeta => {
-                if (Object.keys(exifMeta).length === 0) {
-                    // Nothing extracted — just clear the loading flag
-                    setEntries(cur =>
-                        cur.map(e => e.file === entry.file ? { ...e, exifLoading: false } : e)
-                    );
-                    return;
-                }
-                setEntries(cur =>
-                    cur.map(e =>
-                        e.file === entry.file
-                            ? { ...e, exifLoading: false, meta: { ...e.meta, ...exifMeta } }
-                            : e
-                    )
-                );
-            });
+            const originalFile = entry.file;
+            (async () => {
+                // Run EXIF extraction and HEIC conversion in parallel
+                const [exifMeta, jpegFile] = await Promise.all([
+                    extractExifMeta(originalFile),
+                    isHeicFile(originalFile)
+                        ? heic2any({ blob: originalFile, toType: 'image/jpeg', quality: 0.92 })
+                            .then(blob => {
+                                const b = Array.isArray(blob) ? blob[0] : blob;
+                                return new File([b], originalFile.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+                            })
+                            .catch(() => null)
+                        : Promise.resolve(null),
+                ]);
+
+                setEntries(cur => cur.map(e => {
+                    if (e.file !== originalFile) return e;
+                    const updated = { ...e, exifLoading: false, meta: { ...e.meta, ...exifMeta } };
+                    if (jpegFile) {
+                        URL.revokeObjectURL(e.preview);
+                        updated.file = jpegFile;
+                        updated.preview = URL.createObjectURL(jpegFile);
+                    }
+                    return updated;
+                }));
+            })();
         }
     }, []);
 
@@ -128,14 +139,7 @@ export function UploadModal({ isOpen, onClose, onUploadDone, boardId, accessToke
             if (entries[i].status === 'done') continue;
             setEntries(prev => prev.map((e, idx) => idx === i ? { ...e, status: 'uploading' } : e));
             try {
-                let file = entries[i].file;
-                const isHeic = file.type === 'image/heic' || file.type === 'image/heif'
-                    || /\.(heic|heif)$/i.test(file.name);
-                if (isHeic) {
-                    const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
-                    const converted = Array.isArray(blob) ? blob[0] : blob;
-                    file = new File([converted], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
-                }
+                const file = entries[i].file;
                 const { photo_id, upload_url } = await getUploadUrl(boardId, file.name, accessToken, file.type, file.size);
                 await uploadToS3(upload_url, file);
                 await confirmPhoto(boardId, photo_id, accessToken, entries[i].meta);
