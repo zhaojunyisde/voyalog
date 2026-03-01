@@ -10,6 +10,7 @@ interface Tokens {
 interface User {
   user_id: string;
   username: string;
+  board_id: string;
 }
 
 interface AuthContextType {
