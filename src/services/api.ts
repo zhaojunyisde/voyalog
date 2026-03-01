@@ -52,7 +52,8 @@ export interface Photo {
   photo_id: string;
   filename: string;
   s3_key: string;
-  url: string;
+  url?: string;
+  thumbnail_url?: string;
   status: string;
   uploaded_at: string;
   created_at?: string;
@@ -78,8 +79,9 @@ export interface Board {
   created_at: string;
 }
 
-export async function getBoard(boardId: string, token: string): Promise<{ board: Board; photos: Photo[] }> {
-  return apiGet(`/boards/${boardId}`, token);
+export async function getBoard(boardId: string, token: string, thumbnailOnly = false): Promise<{ board: Board; photos: Photo[] }> {
+  const qs = thumbnailOnly ? '?thumbnail_only=true' : '';
+  return apiGet(`/boards/${boardId}${qs}`, token);
 }
 
 export async function getUploadUrl(
