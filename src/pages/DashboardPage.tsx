@@ -769,41 +769,72 @@ export function DashboardPage() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
             gap: '0.75rem',
           }}>
-            {photos.map(photo => (
-              <div
-                key={photo.photo_id}
-                onMouseEnter={() => setHoveredId(photo.photo_id)}
-                onMouseLeave={() => setHoveredId(null)}
-                style={{
-                  position: 'relative', aspectRatio: '1',
-                  borderRadius: '0.75rem', overflow: 'hidden',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                }}
-              >
-                <img
-                  src={photo.url}
-                  alt={photo.filename}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-                {hoveredId === photo.photo_id && (
-                  <button
-                    onClick={() => handleDelete(photo.photo_id)}
-                    disabled={deletingId === photo.photo_id}
-                    style={{
-                      position: 'absolute', top: '0.5rem', right: '0.5rem',
-                      width: '28px', height: '28px', borderRadius: '50%',
-                      background: 'rgba(220,38,38,0.9)', border: 'none',
-                      color: '#fff', cursor: 'pointer', fontSize: '0.85rem',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: 'var(--font-main)',
-                    }}
-                  >
-                    {deletingId === photo.photo_id ? '…' : '×'}
-                  </button>
-                )}
-              </div>
-            ))}
+            {photos.map(photo => {
+              const isHovered = hoveredId === photo.photo_id;
+              const hasOverlay = photo.title || photo.location || photo.date;
+              return (
+                <div
+                  key={photo.photo_id}
+                  onMouseEnter={() => setHoveredId(photo.photo_id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  style={{
+                    position: 'relative', aspectRatio: '1',
+                    borderRadius: '0.75rem', overflow: 'hidden',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                  }}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.title ?? photo.filename}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+
+                  {/* Metadata overlay */}
+                  {hasOverlay && (
+                    <div style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)',
+                      padding: '1.5rem 0.65rem 0.55rem',
+                    }}>
+                      {photo.title && (
+                        <p style={{
+                          color: '#fff', fontWeight: 700, fontSize: '0.78rem',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          marginBottom: '0.1rem',
+                        }}>{photo.title}</p>
+                      )}
+                      {isHovered && (photo.date || photo.location) && (
+                        <p style={{
+                          color: 'rgba(255,255,255,0.75)', fontSize: '0.65rem',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {[photo.date, photo.location].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Delete button */}
+                  {isHovered && (
+                    <button
+                      onClick={() => handleDelete(photo.photo_id)}
+                      disabled={deletingId === photo.photo_id}
+                      style={{
+                        position: 'absolute', top: '0.5rem', right: '0.5rem',
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: 'rgba(220,38,38,0.9)', border: 'none',
+                        color: '#fff', cursor: 'pointer', fontSize: '0.85rem',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'var(--font-main)',
+                      }}
+                    >
+                      {deletingId === photo.photo_id ? '…' : '×'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
