@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { Navbar } from '../components/Navbar';
 import ExifReader from 'exifreader';
 import {
@@ -15,7 +15,7 @@ import {
   type PhotoMeta,
 } from '../services/api';
 
-const PHOTO_LIMIT = 100;
+const PHOTO_LIMIT = 5;
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
