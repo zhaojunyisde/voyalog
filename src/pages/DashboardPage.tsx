@@ -7,12 +7,12 @@ export function DashboardPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !tokens) navigate('/login');
+    if (!loading && !tokens) navigate('/');
   }, [loading, tokens, navigate]);
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   if (loading) {

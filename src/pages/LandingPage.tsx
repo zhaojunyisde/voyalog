@@ -4,12 +4,27 @@ import { Navbar } from '../components/Navbar';
 import LandingMapLayer from '../components/LandingMapLayer';
 import LandingHeroLayer from '../components/LandingHeroLayer';
 import LandingFeaturesLayer from '../components/LandingFeaturesLayer';
+import { AuthModal } from '../components/AuthModal';
 import { useIsMobile } from '../hooks/useMobile';
 
 export const LandingPage: React.FC = () => {
     const isMobile = useIsMobile();
     const containerRef = useRef<HTMLDivElement>(null);
     const [isMapFocused, setIsMapFocused] = useState(false);
+
+    // Auth modal state
+    const [authModalOpen, setAuthModalOpen] = useState(false);
+    const [authModalView, setAuthModalView] = useState<'login' | 'signup'>('login');
+
+    const openSignIn = () => {
+        setAuthModalView('login');
+        setAuthModalOpen(true);
+    };
+
+    const openJoin = () => {
+        setAuthModalView('signup');
+        setAuthModalOpen(true);
+    };
 
     // Map focus listeners
     useEffect(() => {
@@ -55,7 +70,14 @@ export const LandingPage: React.FC = () => {
                 overflow: 'clip'
             }}
         >
-            <Navbar />
+            <Navbar onSignIn={openSignIn} onJoin={openJoin} />
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={authModalOpen}
+                initialView={authModalView}
+                onClose={() => setAuthModalOpen(false)}
+            />
 
             {/* Sticky container that holds all animated layers */}
             <div style={{

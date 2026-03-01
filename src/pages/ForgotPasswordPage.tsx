@@ -41,7 +41,7 @@ const labelStyle: React.CSSProperties = {
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<'request' | 'reset'>('request');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [form, setForm] = useState({ code: '', new_password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ export function ForgotPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      await apiPost('/auth/forgot-password', { username });
+      await apiPost('/auth/forgot-password', { email });
       setStep('reset');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Request failed');
@@ -65,7 +65,7 @@ export function ForgotPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      await apiPost('/auth/reset-password', { username, code: form.code, new_password: form.new_password });
+      await apiPost('/auth/reset-password', { email, code: form.code, new_password: form.new_password });
       navigate('/login');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Reset failed');
@@ -115,15 +115,15 @@ export function ForgotPasswordPage() {
             Reset password
           </h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>
-            Enter your username and we'll send a reset code to your email.
+            Enter your email and we'll send a reset code.
           </p>
           {errorBox}
           <form onSubmit={handleRequest} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label style={labelStyle}>Username</label>
-              <input type="text" required value={username}
-                onChange={e => setUsername(e.target.value)}
-                style={inputStyle} placeholder="your_username" />
+              <label style={labelStyle}>Email</label>
+              <input type="email" required value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={inputStyle} placeholder="you@example.com" />
             </div>
             <button type="submit" disabled={loading} style={btnStyle(loading)}>
               {loading ? 'Sending…' : 'Send Reset Code'}
